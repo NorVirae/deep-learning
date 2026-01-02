@@ -2,6 +2,8 @@ import torch
 import numpy as np
 import os
 
+import torch.nn as nn
+import torch.nn.functional as F
 
 from torchvision import datasets
 import torchvision.transforms as transforms
@@ -65,7 +67,6 @@ test_loader = torch.utils.data.DataLoader(
     test_data, batch_size=batch_size, sampler=valid_sampler, num_workers=num_workers
 )
 
-print(train_loader.dataset, "Train")
 
 # specify the image classes
 
@@ -84,8 +85,7 @@ image_classes = [
 
 
 # helper function to help unnormalize and display image
-def imshow(ax,img):
-    print("Got here")
+def imshow(ax, img):
     img = img / 2 + 0.5
     ax.imshow(np.transpose(img, (1, 2, 0)))
 
@@ -93,14 +93,79 @@ def imshow(ax,img):
 #
 dataiter = iter(train_loader)
 images, labels = next(dataiter)
+print(len(train_data))
+
 images = images.numpy()
 
 fig = plt.figure(figsize=(25, 4))
 
 for idx in np.arange(20):
     ax = fig.add_subplot(2, 20 // 2, idx + 1, xticks=[], yticks=[])
-    imshow(ax,images[idx])
-    print(labels)
+    imshow(ax, images[idx])
     ax.set_title(image_classes[labels[idx]])
 
-plt.show()
+rgb_img = np.squeeze(images[10])
+# print(images[3])
+channels = ["red channel", "green channel", "blue channel"]
+
+fig = plt.figure(figsize=(36, 36))
+for idx in np.arange(rgb_img.shape[0]):
+    ax = fig.add_subplot(1, 3, idx + 1)
+    img = rgb_img[idx]
+    ax.imshow(img, cmap="gray")
+    ax.set_title(channels[idx])  # should be channels[idx]
+    width, height = img.shape
+
+    thresh = img.max() / 2.5
+
+    for x in range(width):
+        for y in range(height):
+            val = round(img[x][y], 2) if img[x][y] != 0 else 0
+            ax.annotate(
+                str(val),
+                xy=(y, x),
+                horizontalalignment="center",
+                verticalalignment="center",
+                size=8,
+                color="white" if img[x][y] < thresh else "black",
+            )
+
+
+class Net(nn.Module):
+    def __init__(self):
+        super(Net, self).__init__()
+        self.conv1 = nn.Conv2d(3, 16, 3, padding=1)
+        self.conv2 = nn.Conv2d(16, 32, 3, padding=1)
+        self.conv3 = nn.Conv2d(32, 16, 3, padding=1)
+
+        self.pool = nn.MaxPool2d(2, 2)
+
+        self.fc1 = nn.Linear(16 * 4 * 4, 10)
+
+        self.dropout = nn.Dropout(p=0.2)
+
+        self.out = nn.LogSoftmax(dim=1)
+
+    def flatten(self, x):
+        return x.view(x.size()[0], -1)
+    
+    def forward(self, x):
+        x = self.dropout(self.pool(F.relu(self.conv1(x))))
+        x = self.dropout(self.pool(F.relu(self.conv2(x))))
+        x = self.dropout(self.pool(F.relu(self.conv3(x))))
+
+        x = self.flatten(x)
+        x = self.fc1(x)
+        x = self.out(x)
+        return x
+    
+model = Net()
+print(model, "Model")
+
+if train_on_gpu:
+    model.cuda()
+
+
+
+
+# plt.show()
