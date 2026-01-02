@@ -4,11 +4,13 @@ import os
 
 import torch.nn as nn
 import torch.nn.functional as F
+import torch.optim as optim
 
 from torchvision import datasets
 import torchvision.transforms as transforms
 from torch.utils.data.sampler import SubsetRandomSampler
 
+from torchsummary import summary
 
 import matplotlib.pyplot as plt
 
@@ -148,7 +150,7 @@ class Net(nn.Module):
 
     def flatten(self, x):
         return x.view(x.size()[0], -1)
-    
+
     def forward(self, x):
         x = self.dropout(self.pool(F.relu(self.conv1(x))))
         x = self.dropout(self.pool(F.relu(self.conv2(x))))
@@ -158,14 +160,126 @@ class Net(nn.Module):
         x = self.fc1(x)
         x = self.out(x)
         return x
-    
+
+
 model = Net()
 print(model, "Model")
 
 if train_on_gpu:
     model.cuda()
 
+summary(model=model, input_size=images.shape[1:], batch_size=20)
+criterion = nn.NLLLoss()
+optimizer = optim.Adam(model.parameters())
+
+n_epochs = 20
+epochs_no_improve = 0
+max_epochs_stop = 3
+
+save_file_name = "model-cifar.pt"
+valid_loss_min = np.inf
+
+
+def train(model, train_loader, valid_loader, n_epochs=20, save_file="model-cifar.pt"):
+    criterion = nn.NLLLoss()
+
+    optimizer = optim.Adam(model.parameters())
+
+    epochs_no_improve = 0
+    max_epochs_stop = 3
+    valid_loss_min = np.inf
+
+    for epoch in range(n_epochs + 1):
+        train_loss = 0.0
+        valid_loss = 0.0
+
+        train_acc = 0
+        valid_acc = 0
+
+        model.train()
+
+        for ii, (data, target) in enumerate(train_loader):
+            if train_on_gpu:
+                data, target = data.cuda(), target.cuda()
+
+                optimizer.zero_grad()
+
+                output = model(data)
+
+                loss = criterion(output, target)
+
+                loss.backward()
+
+                optimizer.step()
+
+                train_loss += loss.item()
+
+                ps = torch.exp(output)
+
+                topk, topclass = ps.topk(1, dim=1)
+                equals = topclass == target.view(*topclass.shape)
+                accuracy = torch.mean(equals.type(torch.FloatTensor))
+                train_acc += accuracy.item()
+
+                print(
+                    f"Epoch: {epoch}  \t {100 * ii/len(train_loader):.2f}% complete.",
+                    end="\r",
+                )
+        # Validate model
+        model.eval()
+        for data, target in valid_loader:
+            if train_on_gpu:
+                data, target = data.cuda(), target.cuda()
+
+            output = model(data)
+            loss = criterion(output, target)
+            valid_loss += loss.item()
+
+            ps = torch.exp(output)
+            topk, topclass = ps.topk(1, dim=1)
+            equals = topclass == target.view(*topclass.shape)
+            accuracy = torch.mean(equals.type(torch.FloatTensor))
+            valid_acc += accuracy.item()
+        train_loss = train_loss / len(train_loader)
+        valid_loss = valid_loss / len(valid_loader)
+
+        train_acc = train_acc / len(train_loader)
+        valid_acc = valid_acc / len(valid_loader)
+
+        print(
+            "\nEpoch: {} \tTraining Loss: {:.6f} \tValidation Loss: {:.6f}".format(
+                epoch, train_loss, valid_loss
+            )
+        )
+
+        print(f"\n Training Accuracy:  {100 * train_acc:.2f}%t Validation Accuracy: {100 * valid_acc:.2f}%")
+
+        if (valid_loss <= valid_loss_min):
+            print("Validation Loss decreased ({:.6f} --> {:.6f}). Saving Model ...".format(
+                valid_loss_min,
+                valid_loss,
+            ))
+
+            torch.save(model.state_dict(), save_file)
+            epochs_no_improve = 0
+            valid_loss_min = valid_loss
+        else:
+            epochs_no_improve += 1
+            print(f"{epochs_no_improve} epochs  with no  improvement.")
+            if(epochs_no_improve > max_epochs_stop):
+                print("Early Stopping")
+                break
+
+if __name__ == "__main__":
+    train(
+        model=model,
+        valid_loader=valid_loader,
+        train_loader=train_loader,
+        n_epochs=n_epochs,
+        save_file=save_file_name,
+    )
 
 
 
+# model.load_state_dict(torch.load(save_file_name))
 # plt.show()
