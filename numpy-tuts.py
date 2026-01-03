@@ -72,9 +72,30 @@ two_dim = np.array([[1, 2, 3],
                     [4, 5, 6], 
                     [7, 8, 9]])
 
-print(two_dim[0:1])
-print(two_dim[:,0:2])
+# print(two_dim[0:1])
+sect1 = two_dim[:,1:3]
+least_sect1 = sect1[1:3]
+sect1_real = 1* ((least_sect1[0][0] * least_sect1[1][1]) - (least_sect1[0][1] * least_sect1[1][0]))
+print(least_sect1)
+print(sect1_real)
+
+
+sect2 = two_dim[:,0:3:2]
+least_sect2 = sect2[1:3]
+sect2_real = -1 * ((least_sect2[0][0] * least_sect2[1][1]) - (least_sect2[0][1] * least_sect2[1][0]))
+print(least_sect2)
+print(sect2_real)
+
+sect3 = two_dim[:,0:2:1]
+least_sect3 = sect3[1:3]
+sect3_real = 1 * ((least_sect3[0][0] * least_sect3[1][1]) - (least_sect3[0][1] * least_sect3[1][0]))
+print(least_sect3)
+print(sect3_real)
+
+det = sect1_real + sect2_real + sect3_real
+print("DETERMINANT for matrix {}  is  {:.2}".format(two_dim, float(det)))
+
 
 a = np.array([0, 1, 2, 3, 4, 5, 6])
 n_4 = a[::1]
-print(n_4)
+# print(n_4)
