@@ -14,3 +14,4 @@ def plotlines(A, b):
     plt.axvline(0, color="black")
     plt.grid(True)
     plt.show()
+
