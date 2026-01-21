@@ -48,8 +48,17 @@ def compute_model_output(x, w, b):
 
     return f_wb
 
+def predict(x):
+    f_wb= w * x + b
+    return f_wb
+
 tmp_f_wb = compute_model_output(x_train, w, b)
+
+x_new = 1.2
+x2 = predict(x_new)
 print(f"Check {tmp_f_wb}")
+
+print(x2, "zuma")
 
 # Actual Values
 plt.plot(x_train, tmp_f_wb, c="b", label="Predictions")
