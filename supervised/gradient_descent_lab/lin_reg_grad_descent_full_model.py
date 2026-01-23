@@ -7,7 +7,6 @@ from utils_uni import plt_house_x, plt_contour_wgrad, plt_divergence, plt_gradie
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 STYLE_PATH = os.path.join(BASE_DIR, "deep.mplstyle")
-print(STYLE_PATH, "STYLE PATH")
 plt.style.use(STYLE_PATH)
 x_train = np.array([1.0, 2.0])
 y_train = np.array([300.0, 500.0])
