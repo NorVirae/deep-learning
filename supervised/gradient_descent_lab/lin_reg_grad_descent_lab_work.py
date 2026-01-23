@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import math
 
 """
 Firstly you need a way to compute
@@ -109,8 +110,13 @@ def calculate_gradient_descent(x, y, w_in, b_in, alpha, num_iters):
         w = tmp_w
         b = tmp_b
 
+    return w, b
 
 
+def predict(x, w, b):
+    y = w * x + b
+
+    return y
 
 
 w_in = 0
@@ -118,11 +124,15 @@ b_in = 0
 
 num_iters = 100000
 alpha = 1.0e-2
-x_train = np.array([1.0, 2.0 ])
+x_train = np.array([1.0, 2.0])
 y_train = np.array([300.0, 500.0])
 
-calculate_gradient_descent(x_train, y_train, w_in, b_in, alpha, num_iters)
+w, b = calculate_gradient_descent(x_train, y_train, w_in, b_in, alpha, num_iters)
 
-plt.plot(x_train, y_train, "--", zorder=9000)
+print(w, b)
+print(round(w), round(b))
+print(predict(1.6, round(w), round(b)))
 
-plt.show()
+# plt.plot(x_train, y_train, "--", zorder=9000)
+
+# plt.show()
