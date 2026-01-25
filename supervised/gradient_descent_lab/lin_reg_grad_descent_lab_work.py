@@ -132,6 +132,7 @@ w, b = calculate_gradient_descent(x_train, y_train, w_in, b_in, alpha, num_iters
 print(w, b)
 print(round(w), round(b))
 print(predict(1.6, round(w), round(b)))
+np.dot
 
 # plt.plot(x_train, y_train, "--", zorder=9000)
 
