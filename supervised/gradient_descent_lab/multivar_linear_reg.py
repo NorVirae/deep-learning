@@ -11,22 +11,6 @@ plt.style.use(STYLE_PATH)
 np.set_printoptions(precision=2)
 
 
-X_train = np.array([[2104, 5, 1, 45], [1416, 3, 2, 40], [852, 2, 1, 35]])
-y_train = np.array([460, 232, 178])
-
-print(f"X train shape: {X_train.shape} the type is {type(X_train)}")
-print(X_train)
-
-print(f"Y train shape {y_train.shape} the type is {type(y_train)} ")
-print(y_train)
-
-
-b_init = 785.1811367994083
-w_init = np.array([0.39133535, 18.75376741, -53.36032453, -26.42131618])
-
-print(f"w_nit shape is {w_init.shape} b_init type is {type(b_init)}")
-
-
 def predict_single_loop(x, w, b):
     """
     Docstring for predict_single_loop
@@ -59,16 +43,6 @@ def predict(x, w, b):
 
     p = np.dot(x, w) + b
     return p
-
-
-x_vector = X_train[0, :]
-print(f"The current X first row[0]{x_vector}")
-
-result = predict_single_loop(x_vector, w_init, b_init)
-print(f"this is the prediction {result}")
-
-pred_dot_result = predict(x_vector, w_init, b_init)
-print(f"this is the result from dot product {pred_dot_result}")
 
 
 def compute_cost(X, y, w, b):
@@ -122,7 +96,9 @@ def compute_gradient(X, y, w, b):
     return dj_dw, dj_db
 
 
-def compute_gradient_descent(X, y, w, b, compute_gradient, num_iters):
+def compute_gradient_descent(
+    X, y, w_in, b_in, alpha, compute_gradient, compute_cost_function, num_iters
+):
     """
     Docstring for compute_gradient_descent
 
@@ -132,14 +108,63 @@ def compute_gradient_descent(X, y, w, b, compute_gradient, num_iters):
     :param b: the Bias
     :param compute_gradient: A function that calculates the gradient
 
+    w = w - α(dj_dw(x(i)))
+    b = b - α(dj_db(x(i)))
+
 
     """
 
+    w = copy.deepcopy(w_in)
+    b = b_in
+    cost_history = []
+
+    for i in range(num_iters):
+        dj_dw, dj_db = compute_gradient(X, y, w, b)
+        w_i = w - alpha * dj_dw
+        b_i = b - alpha * dj_db
+        w = w_i
+        b = b_i
+
+        cost = compute_cost_function(X, y, w, b)
+        cost_history.append(cost)
+
+        if i % math.ceil(num_iters / 10) == 0:
+            print(
+                f"""Current Progress: {i} \n
+                  Current Weight: {w}\n
+                  bias: {b:0.2f} \n
+                  with cost: {cost}\n
+                  dj_dw: {dj_dw}\n
+                  dj_db: {dj_db}
+                \n\n\n"""
+            )
+
+    return w, b
 
 
-computed_cost = compute_cost(X_train, y_train, w_init, b_init)
-print(f"This is the computed cost {computed_cost}")
+# computed_cost = compute_cost(X_train, y_train, w_init, b_init)
+# print(f"This is the computed cost {computed_cost}")
 
-dj_dw, dj_db = compute_gradient(X_train, y_train, w_init, b_init)
+# dj_dw, dj_db = compute_gradient(X_train, y_train, w_init, b_init)
 
-print(f"this is dj_dw: {dj_dw} and this is dj_db: {dj_db}")
+# print(f"this is dj_dw: {dj_dw} and this is dj_db: {dj_db}")
+
+
+X_train = np.array([[2104, 5, 1, 45], [1416, 3, 2, 40], [852, 2, 1, 35]])
+y_train = np.array([460, 232, 178])
+
+
+b_init = 785.1811367994083
+w_init = np.array([0.39133535, 18.75376741, -53.36032453, -26.42131618])
+num_iters = 1000
+alpha = 5.0e-7
+print(alpha)
+
+init_b = 0.0
+init_w = np.zeros_like(w_init)
+print(f"{init_w} - Zero Like")
+
+w, b = compute_gradient_descent(
+    X_train, y_train, init_w, init_b, alpha, compute_gradient, compute_cost, num_iters
+)
+print(f"Final w: {w} and Final b: {b:0.2f}")
