@@ -14,9 +14,8 @@ import os
 from utils_common import compute_cost
 from utils_common import dlblue, dlorange, dldarkred, dlmagenta, dlpurple, dlcolors
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-STYLE_PATH = os.path.join(BASE_DIR, "deep.mplstyle")
-plt.style.use(STYLE_PATH)
+
+plt.style.use("./lib/deep.mplstyle")
 n_bin = 5
 dlcm = LinearSegmentedColormap.from_list("dl_map", dlcolors, N=n_bin)
 

@@ -4,10 +4,7 @@ import math, copy
 import os
 import pathlib
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-STYLE_PATH = os.path.join(BASE_DIR, "deep.mplstyle")
-print(BASE_DIR)
-plt.style.use(STYLE_PATH)
+plt.style.use("./lib/deep.mplstyle")
 np.set_printoptions(precision=2)
 
 

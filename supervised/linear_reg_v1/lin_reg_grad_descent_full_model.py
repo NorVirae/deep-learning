@@ -3,11 +3,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-from utils_uni import plt_house_x, plt_contour_wgrad, plt_divergence, plt_gradients
+from lib.utils_uni import plt_house_x, plt_contour_wgrad, plt_divergence, plt_gradients
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-STYLE_PATH = os.path.join(BASE_DIR, "deep.mplstyle")
-plt.style.use(STYLE_PATH)
+plt.style.use("./lib/deep.mplstyle")
 x_train = np.array([1.0, 2.0])
 y_train = np.array([300.0, 500.0])
 

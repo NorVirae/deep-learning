@@ -6,9 +6,8 @@ lab_utils_common.py
 import numpy as np
 import os
 import matplotlib.pyplot as plt
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-STYLE_PATH = os.path.join(BASE_DIR, "deep.mplstyle")
-plt.style.use(STYLE_PATH)
+
+plt.style.use("./lib/deep.mplstyle")
 dlblue = '#0096ff'; dlorange = '#FF9300'; dldarkred='#C00000'; dlmagenta='#FF40FF'; dlpurple='#7030A0';
 dlcolors = [dlblue, dlorange, dldarkred, dlmagenta, dlpurple]
 dlc = dict(dlblue = '#0096ff', dlorange = '#FF9300', dldarkred='#C00000', dlmagenta='#FF40FF', dlpurple='#7030A0')
