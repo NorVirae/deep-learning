@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 
 # checkout nupy exponential e^z
-array_el = np.arange(-10, 10, 1)
+array_el = np.arange(-8, 10, 1)
 array_exp = np.exp(array_el)
 
 # print(f"Array elements : {array_el} \nArray Exponential: {array_exp}")
@@ -29,8 +29,20 @@ def sigmoid(z):
 # checking out sigmoid function passing through the center
 
 sigmoid_single = sigmoid(single_el)
-print(f"Single Element: {single_el} sigmoid single: {sigmoid_single}")
+# print(f"Single Element: {single_el} sigmoid single: {sigmoid_single}")
 
-sigmoid_array = sigmoid(array_el)
-print(f"Array Element: {array_el} sigmoid array: {sigmoid_array}")
+y = sigmoid(array_el)
+# print(f"Array Element: {array_el} sigmoid array: {sigmoid_array}")
 
+print("Elements  ----->  Sigmoid")
+print(np.c_[array_el, y])
+
+# Lets plot this thing
+
+fig, ax = plt.subplots(1, 1, figsize=(5, 3))
+ax.plot(array_el, y)
+ax.set_ylabel("Sigmoid [Y] (1) or (0)")
+ax.set_xlabel("X or Array Elements")
+
+
+plt.show()
